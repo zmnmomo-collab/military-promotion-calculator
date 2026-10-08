@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>حاسبة استحقاق الترقيات العسكرية</title>
+<style>
+body{font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;background:#eef7f4;color:#172033;margin:0;padding:18px}
+.wrap{max-width:736px;margin:auto}.card{background:#f8fafc;border:1px solid #dbe2ea;border-radius:18px;padding:18px;margin:10px 0}.title{font-size:21px;font-weight:900}.sub{font-size:13px;color:#64748b;line-height:1.7;margin-top:5px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:15px}label{display:block;font-size:13px;font-weight:800;margin-bottom:6px}
+input,select{width:100%;min-height:46px;border:1px solid #dbe2ea;border-radius:11px;background:#fff;padding:9px 12px;font-size:16px;color:#172033;box-sizing:border-box}
+.section{font-weight:900;margin-top:19px;margin-bottom:5px}.feet-row{display:grid;grid-template-columns:1.6fr .65fr .65fr auto;gap:8px;align-items:end;margin-top:9px}
+.remove{height:46px;border:1px solid #eccaca;border-radius:10px;background:#fff2f2;color:#a33;font-weight:800;padding:0 12px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}button{min-height:46px;border:0;border-radius:11px;padding:10px 17px;font-size:15px;font-weight:900;cursor:pointer}.primary{background:#176b5b;color:#fff}.secondary{background:#e9eef3;color:#172033}
+.error{display:none;background:#fff2f2;color:#9b2c2c;border:1px solid #edcaca;border-radius:11px;padding:10px;margin-top:12px;font-weight:700}
+.result{background:#e7f3ef;border:2px solid #176b5b;border-radius:18px;padding:18px;margin-top:14px}.small{font-size:13px;color:#64748b}.rank{font-size:27px;font-weight:950;margin:5px 0 13px}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.stat{background:#fff;border:1px solid #dbe2ea;border-radius:12px;padding:11px}.stat b{display:block;font-size:12px;color:#64748b;margin-bottom:4px}.stat span{font-weight:850}
+.schedule{margin-top:12px;background:#fff;border:1px solid #dbe2ea;border-radius:13px;padding:13px;font-weight:800;line-height:1.8}.schedule strong{color:#176b5b}.note{font-size:12px;color:#64748b;line-height:1.8}
+@media(max-width:560px){.grid,.stats{grid-template-columns:1fr}.feet-row{grid-template-columns:1fr 1fr 1fr auto}.feet-row .fname-wrap{grid-column:1/-1}}
+</style>
+</head>
+<body><div class="wrap">
+<div class="card"><div class="title">حاسبة استحقاق الترقيات العسكرية</div><div class="sub">تحسب الخدمة من <b>تاريخ أمر التعيين</b>، وتضيف القدمات الممنوحة لغرض الترقية، ثم تحدد الرتبة التالية وموعد الاستحقاق.</div></div>
+<form id="form" class="card">
+<div class="grid">
+<div><label>الرتبة الحالية</label><select id="rank" required><option value="">اختر الرتبة الحالية</option>
+<option value="0">شرطي</option><option value="1">شرطي أول</option><option value="2">نائب عريف</option><option value="6">عريف</option><option value="9">رئيس عرفاء</option><option value="12">مفوض درجة 8</option><option value="15">مفوض درجة 7</option><option value="18">مفوض درجة 6</option><option value="21">مفوض درجة 5</option><option value="24">مفوض درجة 4</option><option value="27">مفوض درجة 3</option><option value="30">مفوض درجة 2</option><option value="33">مفوض درجة 1</option></select></div>
+<div><label>تاريخ أمر التعيين</label><input id="appoint" type="date" required></div>
+<div><label>الحساب إلى تاريخ</label><input id="asof" type="date" required></div>
+</div>
+<div class="section">القدمات الممنوحة</div><div class="sub">أضف كل قدم على حدة، مثل: قدم شكر وتقدير سنتين أو 6 أشهر.</div>
+<div id="feet"></div><div class="actions"><button type="button" class="secondary" id="add">＋ إضافة قدم</button></div>
+<div class="actions"><button type="submit" class="primary">احسب الاستحقاق</button><button type="button" class="secondary" id="reset">مسح البيانات</button></div><div id="error" class="error"></div>
+</form><div id="result" class="result" style="display:none"></div>
+<div class="card note"><b>مدد الخدمة المستخدمة في الحساب:</b><br>شرطي أول: سنة واحدة — نائب عريف: سنتان — عريف: 6 سنوات — رئيس عرفاء: 9 سنوات — مفوض درجة 8: 12 سنة — مفوض درجة 7: 15 سنة — مفوض درجة 6: 18 سنة — مفوض درجة 5: 21 سنة — مفوض درجة 4: 24 سنة — مفوض درجة 3: 27 سنة — مفوض درجة 2: 30 سنة — مفوض درجة 1: 33 سنة.</div>
+</div>
+<script>
+const ranks=[["شرطي",0],["شرطي أول",1],["نائب عريف",2],["عريف",6],["رئيس عرفاء",9],["مفوض درجة 8",12],["مفوض درجة 7",15],["مفوض درجة 6",18],["مفوض درجة 5",21],["مفوض درجة 4",24],["مفوض درجة 3",27],["مفوض درجة 2",30],["مفوض درجة 1",33]];
+const $=id=>document.getElementById(id), today=()=>new Date().toISOString().slice(0,10);
+$("asof").value=today();
+function addFoot(){let r=document.createElement("div");r.className="feet-row";r.innerHTML='<div class="fname-wrap"><label>وصف القدم</label><input class="fname" placeholder="مثال: شكر وتقدير"></div><div><label>سنوات</label><input class="fy" type="number" min="0" max="100" value="0"></div><div><label>أشهر</label><input class="fm" type="number" min="0" max="11" value="0"></div><button type="button" class="remove">حذف</button>';r.querySelector(".remove").onclick=()=>r.remove();$("feet").appendChild(r)}
+addFoot();$("add").onclick=addFoot;
+$("reset").onclick=()=>{$("rank").value="";$("appoint").value="";$("asof").value=today();$("feet").innerHTML="";addFoot();$("result").style.display="none";$("error").style.display="none"};
+function D(s){let [y,m,d]=s.split("-").map(Number);return new Date(Date.UTC(y,m-1,d))}
+function days(a,b){return Math.floor((b-a)/86400000)}
+function dur(d){let y=Math.floor(d/365.2425),r=d-y*365.2425,m=Math.floor(r/30.436875),dd=Math.floor(r-m*30.436875);return y+" سنة و "+m+" شهر و "+dd+" يوم"}
+function footMonths(){let x=0;document.querySelectorAll(".feet-row").forEach(r=>x+=(+r.querySelector(".fy").value||0)*12+(+r.querySelector(".fm").value||0));return x}
+$("form").onsubmit=e=>{e.preventDefault();$("error").style.display="none";$("result").style.display="none";
+if(!$("rank").value||!$("appoint").value||!$("asof").value){$("error").textContent="يرجى إدخال جميع البيانات المطلوبة.";$("error").style.display="block";return}
+let start=D($("appoint").value),end=D($("asof").value);if(end<start){$("error").textContent="تاريخ الحساب يجب أن يكون بعد تاريخ أمر التعيين أو مساويًا له.";$("error").style.display="block";return}
+let i=ranks.findIndex(r=>String(r[1])===$("rank").value),cur=ranks[i],service=days(start,end),fm=footMonths(),counted=service+fm*30.436875,next=i+1;
+if(next>=ranks.length){$("result").innerHTML='<div class="small">الرتبة الحالية</div><div class="rank">'+cur[0]+'</div><div class="schedule">تم الوصول إلى أعلى رتبة موجودة في الحاسبة.</div>';$("result").style.display="block";return}
+let target=ranks[next],required=target[1],remaining=Math.max(0,(required-counted/365.2425)*365.2425),eligible=new Date(end.getTime()+remaining*86400000);
+let html='<div class="small">الرتبة الحالية</div><div class="rank">'+cur[0]+'</div><div class="stats"><div class="stat"><b>الرتبة التالية</b><span>'+target[0]+'</span></div><div class="stat"><b>الحالة</b><span>'+((remaining<=0)?"مستحق حاليًا":"غير مستحق حاليًا")+'</span></div><div class="stat"><b>الخدمة الفعلية</b><span>'+dur(service)+'</span></div><div class="stat"><b>مجموع القدمات</b><span>'+Math.floor(fm/12)+" سنة و "+(fm%12)+" شهر"+'</span></div><div class="stat"><b>الخدمة المحتسبة للترقية</b><span>'+dur(counted)+'</span></div><div class="stat"><b>مدة الخدمة المطلوبة</b><span>'+required+' سنة</span></div></div><div class="schedule">';
+if(remaining<=0) html+="<strong>مستحق للترقية حاليًا.</strong>"; else html+="موعد استكمال مدة الخدمة المطلوبة: <strong>"+String(eligible.getUTCDate()).padStart(2,"0")+"/"+String(eligible.getUTCMonth()+1).padStart(2,"0")+"/"+eligible.getUTCFullYear()+"</strong><br>المتبقي: <strong>"+dur(remaining)+"</strong>";
+html+="</div>";$("result").innerHTML=html;$("result").style.display="block";$("result").scrollIntoView({behavior:"smooth",block:"nearest"})};
+</script></body></html>
